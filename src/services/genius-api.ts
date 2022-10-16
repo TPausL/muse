@@ -18,7 +18,6 @@ export default class {
     title: string;
     artist?: string;
   }): Promise<string> {
-
     return (await this.genius.songs.search(title))[0].lyrics();
   }
 }
