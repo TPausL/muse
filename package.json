@@ -78,9 +78,7 @@
     }
   },
   "husky": {
-    "hooks": {
-      "pre-commit": "npm test"
-    }
+    "hooks": {}
   },
   "dependencies": {
     "@discordjs/builders": "1.1.0",
