@@ -199,3 +199,15 @@ export const buildQueueEmbed = (player: Player, page: number): EmbedBuilder => {
 
   return message;
 };
+
+export const buildLyricsEmbed = (
+  song: SongMetadata,
+  lyrics: string
+): EmbedBuilder => {
+  const message = new EmbedBuilder();
+  message
+    .setTitle(`Lyrics for ${song.title}`)
+    .setDescription(lyrics)
+    .setColor("Aqua");
+  return message;
+};

@@ -165,8 +165,6 @@ export default class AddQueryToQueue {
       );
     });
 
-    const firstSong = newSongs[0];
-
     let statusMsg = "";
 
     if (player.voiceConnection === null) {

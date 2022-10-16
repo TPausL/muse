@@ -5,19 +5,25 @@ import PlayerManager from "../managers/player.js";
 import Command from ".";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { STATUS } from "../services/player";
+import LyricsService from "../services/lyrics.js";
 
 @injectable()
 export default class implements Command {
   public readonly slashCommand = new SlashCommandBuilder()
-    .setName("loop")
-    .setDescription("toggle looping the current song");
+    .setName("lyrics")
+    .setDescription("get the lyrics the current song");
 
   public requiresVC = true;
 
   private readonly playerManager: PlayerManager;
+  private readonly lyrics: LyricsService;
 
-  constructor(@inject(TYPES.Managers.Player) playerManager: PlayerManager) {
+  constructor(
+    @inject(TYPES.Managers.Player) playerManager: PlayerManager,
+    @inject(TYPES.Services.LyricsService) lyrics: LyricsService
+  ) {
     this.playerManager = playerManager;
+    this.lyrics = lyrics;
   }
 
   public async execute(
@@ -26,13 +32,9 @@ export default class implements Command {
     const player = this.playerManager.get(interaction.guild!.id);
 
     if (player.status === STATUS.IDLE) {
-      throw new Error("no song to loop!");
+      throw new Error("no song is currently playing!");
     }
 
-    player.loopCurrentSong = !player.loopCurrentSong;
-
-    await interaction.reply(
-      player.loopCurrentSong ? "looped :)" : "stopped looping :("
-    );
+    await this.lyrics.songLyrics({ interaction });
   }
 }
