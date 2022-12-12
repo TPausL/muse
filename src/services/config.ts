@@ -25,14 +25,14 @@ const CONFIG_MAP = {
   BOT_ACTIVITY_TYPE: process.env.BOT_ACTIVITY_TYPE ?? "LISTENING",
   BOT_ACTIVITY_URL: process.env.BOT_ACTIVITY_URL ?? "",
   BOT_ACTIVITY: process.env.BOT_ACTIVITY ?? "music",
-  DEFAULT_PLAYLIST: process.env.DEFAULT_PLAYLIST,
+  DEFAULT_PLAYLIST: process.env.DEFAULT_PLAYLIST
 } as const;
 
 const BOT_ACTIVITY_TYPE_MAP = {
   PLAYING: ActivityType.Playing,
   LISTENING: ActivityType.Listening,
   WATCHING: ActivityType.Watching,
-  STREAMING: ActivityType.Streaming,
+  STREAMING: ActivityType.Streaming
 } as const;
 
 @injectable()

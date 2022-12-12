@@ -7,7 +7,7 @@ export const TYPES = {
   Command: Symbol("Command"),
   ThirdParty: Symbol("ThirdParty"),
   Managers: {
-    Player: Symbol("PlayerManager"),
+    Player: Symbol("PlayerManager")
   },
   Services: {
     AddQueryToQueue: Symbol("AddQueryToQueue"),
@@ -15,6 +15,6 @@ export const TYPES = {
     YoutubeAPI: Symbol("YoutubeAPI"),
     SpotifyAPI: Symbol("SpotifyAPI"),
     GeniusAPI: Symbol("GeniusAPI"),
-    LyricsService: Symbol("LyricsService"),
-  },
+    LyricsService: Symbol("LyricsService")
+  }
 };

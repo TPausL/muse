@@ -1,6 +1,6 @@
 import {
   AutocompleteInteraction,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction
 } from "discord.js";
 import { URL } from "url";
 import { SlashCommandBuilder } from "@discordjs/builders";
@@ -19,19 +19,19 @@ export default class implements Command {
   public readonly slashCommand = new SlashCommandBuilder()
     .setName("insert")
     .setDescription("insert a song to the front of the queue")
-    .addStringOption((option) =>
+    .addStringOption(option =>
       option
         .setName("query")
         .setDescription("YouTube URL, Spotify URL, or search query")
         .setAutocomplete(true)
         .setRequired(true)
     )
-    .addBooleanOption((option) =>
+    .addBooleanOption(option =>
       option
         .setName("shuffle")
         .setDescription("shuffle the input if you're adding multiple tracks")
     )
-    .addBooleanOption((option) =>
+    .addBooleanOption(option =>
       option
         .setName("split")
         .setDescription("if a track has chapters, split it")
@@ -44,7 +44,7 @@ export default class implements Command {
   private readonly addQueryToQueue: AddQueryToQueue;
 
   constructor(
-    @inject(TYPES.ThirdParty) thirdParty: ThirdParty,
+  @inject(TYPES.ThirdParty) thirdParty: ThirdParty,
     @inject(TYPES.KeyValueCache) cache: KeyValueCacheProvider,
     @inject(TYPES.Services.AddQueryToQueue) addQueryToQueue: AddQueryToQueue
   ) {
@@ -63,7 +63,7 @@ export default class implements Command {
       query: query.trim(),
       addToFrontOfQueue: true,
       shuffleAdditions: interaction.options.getBoolean("shuffle") ?? false,
-      shouldSplitChapters: interaction.options.getBoolean("split") ?? false,
+      shouldSplitChapters: interaction.options.getBoolean("split") ?? false
     });
   }
 
@@ -92,7 +92,7 @@ export default class implements Command {
       10,
       {
         expiresIn: ONE_HOUR_IN_SECONDS,
-        key: `autocomplete:${query}`,
+        key: `autocomplete:${query}`
       }
     );
 

@@ -1,8 +1,7 @@
 /* eslint-disable complexity */
 import {
   ChatInputCommandInteraction,
-  GuildMember,
-  MessagePayload,
+  GuildMember
 } from "discord.js";
 import { inject, injectable } from "inversify";
 import shuffle from "array-shuffle";
@@ -12,12 +11,11 @@ import { SongMetadata, STATUS } from "./player.js";
 import PlayerManager from "../managers/player.js";
 import { prisma } from "../utils/db.js";
 import {
-  buildAddedEmbed,
-  buildPlayingMessageEmbed,
+  buildAddedEmbed
 } from "../utils/build-embed.js";
 import {
   getMemberVoiceChannel,
-  getMostPopularVoiceChannel,
+  getMostPopularVoiceChannel
 } from "../utils/channels.js";
 
 @injectable()
@@ -32,7 +30,7 @@ export default class AddQueryToQueue {
     addToFrontOfQueue,
     shuffleAdditions,
     shouldSplitChapters,
-    interaction,
+    interaction
   }: {
     query: string;
     addToFrontOfQueue: boolean;
@@ -70,7 +68,7 @@ export default class AddQueryToQueue {
         "youtu.be",
         "youtube.com",
         "music.youtube.com",
-        "www.music.youtube.com",
+        "www.music.youtube.com"
       ];
 
       if (YOUTUBE_HOSTS.includes(url.host)) {
@@ -154,12 +152,12 @@ export default class AddQueryToQueue {
       newSongs = shuffle(newSongs);
     }
 
-    newSongs.forEach((song) => {
+    newSongs.forEach(song => {
       player.add(
         {
           ...song,
           addedInChannelId: interaction.channel!.id,
-          requestedBy: interaction.member!.user.id,
+          requestedBy: interaction.member!.user.id
         },
         { immediate: addToFrontOfQueue ?? false }
       );
@@ -203,8 +201,8 @@ export default class AddQueryToQueue {
           extraMsg,
           player,
           query
-        }),
-      ],
+        })
+      ]
     });
   }
 }

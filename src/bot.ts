@@ -24,7 +24,7 @@ export default class {
   private readonly commandsByButtonId!: Collection<string, Command>;
 
   constructor(
-    @inject(TYPES.Client) client: Client,
+  @inject(TYPES.Client) client: Client,
     @inject(TYPES.Config) config: Config
   ) {
     this.client = client;
@@ -60,7 +60,7 @@ export default class {
 
     // Register event handlers
     // eslint-disable-next-line complexity
-    this.client.on("interactionCreate", async (interaction) => {
+    this.client.on("interactionCreate", async interaction => {
       try {
         if (interaction.isCommand()) {
           const command = this.commandsByName.get(interaction.commandName);
@@ -85,7 +85,7 @@ export default class {
           ) {
             await interaction.reply({
               content: errorMsg("gotta be in a voice channel"),
-              ephemeral: true,
+              ephemeral: true
             });
             return;
           }
@@ -127,7 +127,7 @@ export default class {
           } else if (interaction.isCommand() || interaction.isButton()) {
             await interaction.reply({
               content: errorMsg(error as Error),
-              ephemeral: true,
+              ephemeral: true
             });
           }
         } catch {}
@@ -146,26 +146,26 @@ export default class {
       if (this.shouldRegisterCommandsOnBot) {
         spinner.text = "📡 updating commands on bot...";
         await rest.put(Routes.applicationCommands(this.client.user!.id), {
-          body: this.commandsByName.map((command) =>
+          body: this.commandsByName.map(command =>
             command.slashCommand.toJSON()
-          ),
+          )
         });
       } else {
         spinner.text = "📡 updating commands in all guilds...";
 
         await Promise.all([
-          ...this.client.guilds.cache.map(async (guild) => {
+          ...this.client.guilds.cache.map(async guild => {
             await registerCommandsOnGuild({
               rest,
               guildId: guild.id,
               applicationId: this.client.user!.id,
-              commands: this.commandsByName.map((c) => c.slashCommand),
+              commands: this.commandsByName.map(c => c.slashCommand)
             });
           }),
           // Remove commands registered on bot (if they exist)
           rest.put(Routes.applicationCommands(this.client.user!.id), {
-            body: [],
-          }),
+            body: []
+          })
         ]);
       }
 
@@ -177,10 +177,10 @@ export default class {
             url:
               this.config.BOT_ACTIVITY_URL === ""
                 ? undefined
-                : this.config.BOT_ACTIVITY_URL,
-          },
+                : this.config.BOT_ACTIVITY_URL
+          }
         ],
-        status: this.config.BOT_STATUS,
+        status: this.config.BOT_STATUS
       });
 
       spinner.succeed(

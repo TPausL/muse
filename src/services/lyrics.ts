@@ -12,7 +12,7 @@ export default class {
   private readonly playerManager: PlayerManager;
 
   constructor(
-    @inject(TYPES.Services.GeniusAPI) geniusAPI: GeniusAPI,
+  @inject(TYPES.Services.GeniusAPI) geniusAPI: GeniusAPI,
     @inject(TYPES.Managers.Player) playerManager: PlayerManager
   ) {
     this.geniusAPI = geniusAPI;
@@ -20,7 +20,7 @@ export default class {
   }
 
   public async songLyrics({
-    interaction,
+    interaction
   }: {
     interaction: ChatInputCommandInteraction;
   }) {
@@ -28,11 +28,11 @@ export default class {
     const current = player.getCurrent();
     const text = await this.geniusAPI.getLyrics({
       title: current!.title,
-      artist: current?.artist,
+      artist: current?.artist
     });
 
     return interaction.reply({
-      embeds: [buildLyricsEmbed(current as SongMetadata, text)],
+      embeds: [buildLyricsEmbed(current as SongMetadata, text)]
     });
   }
 }

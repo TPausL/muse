@@ -12,8 +12,7 @@ export default class {
   }
 
   public async getLyrics({
-    title,
-    artist,
+    title
   }: {
     title: string;
     artist?: string;

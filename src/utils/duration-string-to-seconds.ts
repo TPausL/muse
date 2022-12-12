@@ -1,4 +1,4 @@
-import parse from 'parse-duration';
+import parse from "parse-duration";
 
 /**
  * Parse duration strings to seconds.

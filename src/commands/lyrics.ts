@@ -19,7 +19,7 @@ export default class implements Command {
   private readonly lyrics: LyricsService;
 
   constructor(
-    @inject(TYPES.Managers.Player) playerManager: PlayerManager,
+  @inject(TYPES.Managers.Player) playerManager: PlayerManager,
     @inject(TYPES.Services.LyricsService) lyrics: LyricsService
   ) {
     this.playerManager = playerManager;

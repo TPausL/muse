@@ -15,7 +15,7 @@ import {
   joinVoiceChannel,
   StreamType,
   VoiceConnection,
-  VoiceConnectionStatus,
+  VoiceConnectionStatus
 } from "@discordjs/voice";
 import FileCacheProvider from "./file-cache.js";
 import debug from "../utils/debug.js";
@@ -89,7 +89,7 @@ export default class {
       channelId: channel.id,
       guildId: channel.guild.id,
       adapterCreator: channel.guild
-        .voiceAdapterCreator as DiscordGatewayAdapterCreator,
+        .voiceAdapterCreator as DiscordGatewayAdapterCreator
     });
   }
 
@@ -99,12 +99,17 @@ export default class {
 
   async newPlayingMessage(): Promise<void> {
     try {
-      if (this.nowPlayingMsg && this.nowPlayingMsg.channelId === this.nowPlayingChannel.id) {
-        this.nowPlayingChannel.messages.cache.find(msg => msg.id === this.nowPlayingMsg.id)?.delete();
+      if (
+        this.nowPlayingMsg &&
+        this.nowPlayingMsg.channelId === this.nowPlayingChannel.id
+      ) {
+        this.nowPlayingChannel.messages.cache
+          .find(msg => msg.id === this.nowPlayingMsg.id)
+          ?.delete();
       }
 
       const msg = await this.nowPlayingChannel.send({
-        embeds: [buildPlayingMessageEmbed(this)],
+        embeds: [buildPlayingMessageEmbed(this)]
       });
       this.nowPlayingMsg = msg;
     } catch (err) {
@@ -153,18 +158,18 @@ export default class {
 
     const stream = await this.getStream(currentSong, {
       seek: realPositionSeconds,
-      to,
+      to
     });
     this.audioPlayer = createAudioPlayer({
       behaviors: {
         // Needs to be somewhat high for livestreams
-        maxMissedFrames: 50,
-      },
+        maxMissedFrames: 50
+      }
     });
     this.voiceConnection.subscribe(this.audioPlayer);
     this.audioPlayer.play(
       createAudioResource(stream, {
-        inputType: StreamType.WebmOpus,
+        inputType: StreamType.WebmOpus
       })
     );
     this.attachListeners();
@@ -226,17 +231,17 @@ export default class {
 
       const stream = await this.getStream(currentSong, {
         seek: positionSeconds,
-        to,
+        to
       });
       this.audioPlayer = createAudioPlayer({
         behaviors: {
           // Needs to be somewhat high for livestreams
-          maxMissedFrames: 50,
-        },
+          maxMissedFrames: 50
+        }
       });
       this.voiceConnection.subscribe(this.audioPlayer);
       const resource = createAudioResource(stream, {
-        inputType: StreamType.WebmOpus,
+        inputType: StreamType.WebmOpus
       });
 
       this.audioPlayer.play(resource);
@@ -246,7 +251,7 @@ export default class {
       this.status = STATUS.PLAYING;
       this.nowPlaying = currentSong;
 
-      this.newPlayingMessage();
+      await this.newPlayingMessage();
       if (currentSong.url === this.lastSongURL) {
         this.startTrackingPosition();
       } else {
@@ -254,7 +259,6 @@ export default class {
         this.startTrackingPosition(0);
         this.lastSongURL = currentSong.url;
       }
-
     } catch (error: unknown) {
       await this.forward(1);
 
@@ -296,7 +300,7 @@ export default class {
         this.status = STATUS.IDLE;
 
         const settings = await prisma.setting.findUnique({
-          where: { guildId: this.guildId },
+          where: { guildId: this.guildId }
         });
 
         if (!settings) {
@@ -378,7 +382,7 @@ export default class {
       this.queue = [
         ...this.queue.slice(0, insertAt),
         song,
-        ...this.queue.slice(insertAt),
+        ...this.queue.slice(insertAt)
       ];
     }
   }
@@ -388,7 +392,7 @@ export default class {
 
     this.queue = [
       ...this.queue.slice(0, this.queuePosition + 1),
-      ...shuffledSongs,
+      ...shuffledSongs
     ];
   }
 
@@ -413,7 +417,7 @@ export default class {
   removeCurrent(): void {
     this.queue = [
       ...this.queue.slice(0, this.queuePosition),
-      ...this.queue.slice(this.queuePosition + 1),
+      ...this.queue.slice(this.queuePosition + 1)
     ];
   }
 
@@ -499,7 +503,7 @@ export default class {
               (a as unknown as { audioBitrate: number }).audioBitrate
           ); // Bad typings
 
-          return formats.find((format) =>
+          return formats.find(format =>
             [128, 127, 120, 96, 95, 94, 93].includes(
               parseInt(format.itag as unknown as string, 10)
             )
@@ -507,7 +511,7 @@ export default class {
         }
 
         formats = formats
-          .filter((format) => format.averageBitrate)
+          .filter(format => format.averageBitrate)
           .sort((a, b) => {
             if (a && b) {
               return b.averageBitrate! - a.averageBitrate!;
@@ -515,7 +519,7 @@ export default class {
 
             return 0;
           });
-        return formats.find((format) => !format.bitrate) ?? formats[0];
+        return formats.find(format => !format.bitrate) ?? formats[0];
       };
 
       if (!format) {
@@ -544,7 +548,7 @@ export default class {
           "-reconnect_streamed",
           "1",
           "-reconnect_delay_max",
-          "5",
+          "5"
         ]
       );
 
@@ -559,7 +563,7 @@ export default class {
 
     return this.createReadStream(ffmpegInput, {
       ffmpegInputOptions,
-      cache: shouldCacheVideo,
+      cache: shouldCacheVideo
     });
   }
 
@@ -658,12 +662,12 @@ export default class {
         .noVideo()
         .audioCodec("libopus")
         .outputFormat("webm")
-        .on("error", (error) => {
+        .on("error", error => {
           if (!hasReturnedStreamClosed) {
             reject(error);
           }
         })
-        .on("start", (command) => {
+        .on("start", command => {
           debug(`Spawned ffmpeg with ${command as string}`);
         });
 

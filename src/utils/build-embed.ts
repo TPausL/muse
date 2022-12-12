@@ -1,10 +1,10 @@
 import getYouTubeID from "get-youtube-id";
-import { EmbedBuilder, User } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import Player, {
   MediaSource,
   QueuedSong,
   SongMetadata,
-  STATUS,
+  STATUS
 } from "../services/player.js";
 import getProgressBar from "./get-progress-bar.js";
 import { prettyTime } from "./time.js";
@@ -65,11 +65,7 @@ const getPlayerUI = (player: Player) => {
 };
 
 export const buildAddedEmbed = ({
-  newSongs,
-  addToFrontOfQueue,
-  extraMsg,
-  player,
-  query,
+  newSongs
 }: {
   newSongs: SongMetadata[];
   addToFrontOfQueue: boolean;
@@ -89,7 +85,7 @@ export const buildAddedEmbed = ({
     console.log(newSongs[0].playlist);
     message
       .setDescription(
-        `from playlist [${newSongs[0].playlist?.title}](https://youtube.com/playlist?list=${newSongs[0].playlist?.source})`
+        `from playlist [${newSongs[0].playlist?.title ?? ""}](https://youtube.com/playlist?list=${newSongs[0].playlist?.source ?? ""})`
       )
       .setThumbnail(newSongs[0].playlist?.thumbnail);
   } else {
@@ -110,7 +106,7 @@ export const buildPlayingMessageEmbed = (player: Player): EmbedBuilder => {
     throw new Error("No playing song found");
   }
 
-  const { artist, thumbnailUrl, requestedBy } = currentlyPlaying;
+  const { thumbnailUrl, requestedBy } = currentlyPlaying;
   const message = new EmbedBuilder();
   message
     .setColor(player.status === STATUS.PLAYING ? "Aqua" : "DarkRed")
@@ -121,7 +117,7 @@ export const buildPlayingMessageEmbed = (player: Player): EmbedBuilder => {
       Requested by: <@${requestedBy}>\n
       ${getPlayerUI(player)}
     `
-    )
+    );
 
   if (thumbnailUrl) {
     message.setThumbnail(thumbnailUrl);
@@ -186,10 +182,10 @@ export const buildQueueEmbed = (player: Player, page: number): EmbedBuilder => {
       {
         name: "Total length",
         value: `${totalLength > 0 ? prettyTime(totalLength) : "-"}`,
-        inline: true,
+        inline: true
       },
-      { name: "Page", value: `${page} out of ${maxQueuePage}`, inline: true },
-    ])
+      { name: "Page", value: `${page} out of ${maxQueuePage}`, inline: true }
+    ]);
 
   if (thumbnailUrl) {
     message.setThumbnail(thumbnailUrl);
@@ -229,7 +225,7 @@ export const buildSkipEmbed = (player: Player, n: number): EmbedBuilder => {
     message.setTitle(`Skipped ${n} songs`);
   }
 
-  message.setColor("Green")
+  message.setColor("Green");
   return message;
 };
 

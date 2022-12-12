@@ -12,7 +12,7 @@ import Config from "./config.js";
 import KeyValueCacheProvider from "./key-value-cache.js";
 import {
   ONE_HOUR_IN_SECONDS,
-  ONE_MINUTE_IN_SECONDS,
+  ONE_MINUTE_IN_SECONDS
 } from "../utils/constants.js";
 import { parseTime } from "../utils/time.js";
 
@@ -33,7 +33,7 @@ export default class {
   private readonly ytsrQueue: PQueue;
 
   constructor(
-    @inject(TYPES.ThirdParty) thirdParty: ThirdParty,
+  @inject(TYPES.ThirdParty) thirdParty: ThirdParty,
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.KeyValueCache) cache: KeyValueCacheProvider
   ) {
@@ -53,10 +53,10 @@ export default class {
         ytsr,
         query,
         {
-          limit: 10,
+          limit: 10
         },
         {
-          expiresIn: ONE_HOUR_IN_SECONDS,
+          expiresIn: ONE_HOUR_IN_SECONDS
         }
       )
     );
@@ -85,7 +85,7 @@ export default class {
       this.youtube.videos.get,
       cleanUrl(url),
       {
-        expiresIn: ONE_HOUR_IN_SECONDS,
+        expiresIn: ONE_HOUR_IN_SECONDS
       }
     );
 
@@ -98,7 +98,7 @@ export default class {
   ): Promise<SongMetadata[]> {
     // YouTube playlist
     const playlist = await this.cache.wrap(this.youtube.playlists.get, listId, {
-      expiresIn: ONE_MINUTE_IN_SECONDS,
+      expiresIn: ONE_MINUTE_IN_SECONDS
     });
 
     const playlistVideos: YoutubePlaylistItem[] = [];
@@ -114,7 +114,7 @@ export default class {
         listId,
         { maxResults: "50", pageToken: nextToken },
         {
-          expiresIn: ONE_MINUTE_IN_SECONDS,
+          expiresIn: ONE_MINUTE_IN_SECONDS
         }
       );
 
@@ -129,10 +129,10 @@ export default class {
           const p = {
             searchParams: {
               part: "contentDetails",
-              id: items.map((item) => item.contentDetails.videoId).join(","),
+              id: items.map(item => item.contentDetails.videoId).join(","),
               key: this.youtubeKey,
-              responseType: "json",
-            },
+              responseType: "json"
+            }
           };
           const { items: videoDetailItems } = await this.cache.wrap(
             async () =>
@@ -142,7 +142,7 @@ export default class {
               ).json() as Promise<{ items: VideoDetailsResponse[] }>,
             p,
             {
-              expiresIn: ONE_MINUTE_IN_SECONDS,
+              expiresIn: ONE_MINUTE_IN_SECONDS
             }
           );
 
@@ -156,7 +156,7 @@ export default class {
     const queuedPlaylist = {
       title: playlist.snippet.title,
       source: playlist.id,
-      thumbnail: playlist.snippet.thumbnails.high.url,
+      thumbnail: playlist.snippet.thumbnails.high.url
     };
 
     const songsToReturn: SongMetadata[] = [];
@@ -170,7 +170,7 @@ export default class {
             videoDetails: videoDetails.find(
               (i: { id: string }) => i.id === video.contentDetails.videoId
             ),
-            shouldSplitChapters,
+            shouldSplitChapters
           })
         );
       } catch (_: unknown) {
@@ -186,7 +186,7 @@ export default class {
     video,
     queuedPlaylist,
     videoDetails,
-    shouldSplitChapters,
+    shouldSplitChapters
   }: {
     video: YoutubeVideo | YoutubePlaylistItem;
     queuedPlaylist?: QueuedPlaylist;
@@ -218,7 +218,7 @@ export default class {
       url,
       playlist: queuedPlaylist ?? null,
       isLive: (video as YoutubeVideo).snippet.liveBroadcastContent === "live",
-      thumbnailUrl: video.snippet.thumbnails.medium.url,
+      thumbnailUrl: video.snippet.thumbnails.medium.url
     };
 
     if (!shouldSplitChapters) {
@@ -241,7 +241,7 @@ export default class {
         ...base,
         offset,
         length,
-        title: `${label} (${base.title})`,
+        title: `${label} (${base.title})`
       });
     }
 
@@ -283,7 +283,7 @@ export default class {
         length:
           i === foundTimestamps.length - 1
             ? videoDurationSeconds - offset
-            : foundTimestamps[i + 1].offset - offset,
+            : foundTimestamps[i + 1].offset - offset
       });
     }
 

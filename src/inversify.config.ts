@@ -111,8 +111,8 @@ container
   Unskip,
   Loop,
   Insert,
-  Lyrics,
-].forEach((command) => {
+  Lyrics
+].forEach(command => {
   container.bind<Command>(TYPES.Command).to(command).inSingletonScope();
 });
 
