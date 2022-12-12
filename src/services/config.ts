@@ -25,6 +25,7 @@ const CONFIG_MAP = {
   BOT_ACTIVITY_TYPE: process.env.BOT_ACTIVITY_TYPE ?? "LISTENING",
   BOT_ACTIVITY_URL: process.env.BOT_ACTIVITY_URL ?? "",
   BOT_ACTIVITY: process.env.BOT_ACTIVITY ?? "music",
+  DEFAULT_PLAYLIST: process.env.DEFAULT_PLAYLIST,
 } as const;
 
 const BOT_ACTIVITY_TYPE_MAP = {
@@ -49,6 +50,7 @@ export default class Config {
   readonly BOT_ACTIVITY_TYPE!: Exclude<ActivityType, ActivityType.Custom>;
   readonly BOT_ACTIVITY_URL!: string;
   readonly BOT_ACTIVITY!: string;
+  readonly DEFAULT_PLAYLIST!: string;
 
   constructor() {
     for (const [key, value] of Object.entries(CONFIG_MAP)) {

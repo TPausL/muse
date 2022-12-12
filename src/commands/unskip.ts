@@ -24,11 +24,9 @@ export default class implements Command {
     const player = this.playerManager.get(interaction.guild!.id);
 
     try {
+      player.setTextChannel(interaction.channel!);
+      await interaction.reply({embeds: [buildUnskipEmbed(player)]});
       await player.back();
-      await interaction.reply({
-        content: 'back \'er up\'',
-        embeds: player.getCurrent() ? [buildPlayingMessageEmbed(player)] : [],
-      });
     } catch (_: unknown) {
       throw new Error('no song to go back to');
     }

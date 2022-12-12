@@ -168,6 +168,7 @@ export default class AddQueryToQueue {
     let statusMsg = "";
 
     if (player.voiceConnection === null) {
+      player.setTextChannel(interaction.channel!);
       await player.connect(targetVoiceChannel);
 
       // Resume / start playback
@@ -176,10 +177,6 @@ export default class AddQueryToQueue {
       if (wasPlayingSong) {
         statusMsg = "resuming playback";
       }
-
-      await interaction.editReply({
-        embeds: [buildPlayingMessageEmbed(player)],
-      });
     } else if (player.status === STATUS.IDLE) {
       // Player is idle, start playback instead
       await player.play();
@@ -205,7 +202,7 @@ export default class AddQueryToQueue {
           addToFrontOfQueue,
           extraMsg,
           player,
-          query,
+          query
         }),
       ],
     });

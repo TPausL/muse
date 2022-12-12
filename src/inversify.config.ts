@@ -23,6 +23,7 @@ import Insert from "./commands/insert.js";
 import Clear from "./commands/clear.js";
 import Config from "./commands/config.js";
 import Disconnect from "./commands/disconnect.js";
+import Default from "./commands/default.js";
 import Favorites from "./commands/favorites.js";
 import ForwardSeek from "./commands/fseek.js";
 import Move from "./commands/move.js";
@@ -91,6 +92,7 @@ container
 [
   Clear,
   Config,
+  Default,
   Disconnect,
   Favorites,
   ForwardSeek,

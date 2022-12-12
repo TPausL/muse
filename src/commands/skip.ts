@@ -4,7 +4,7 @@ import {inject, injectable} from 'inversify';
 import PlayerManager from '../managers/player.js';
 import Command from '.';
 import {SlashCommandBuilder} from '@discordjs/builders';
-import {buildPlayingMessageEmbed} from '../utils/build-embed.js';
+import {buildPlayingMessageEmbed, buildSkipEmbed} from '../utils/build-embed.js';
 
 @injectable()
 export default class implements Command {
@@ -34,11 +34,10 @@ export default class implements Command {
     const player = this.playerManager.get(interaction.guild!.id);
 
     try {
+      player.setTextChannel(interaction.channel!);
+      await interaction.reply({ embeds: [buildSkipEmbed(player, numToSkip)] });
+      // await interaction.deleteReply();
       await player.forward(numToSkip);
-      await interaction.reply({
-        content: 'keep \'er movin\'',
-        embeds: player.getCurrent() ? [buildPlayingMessageEmbed(player)] : [],
-      });
     } catch (_: unknown) {
       throw new Error('no song to skip to');
     }

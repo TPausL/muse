@@ -1,5 +1,5 @@
 import getYouTubeID from "get-youtube-id";
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, User } from "discord.js";
 import Player, {
   MediaSource,
   QueuedSong,
@@ -99,6 +99,7 @@ export const buildAddedEmbed = ({
       )
       .setThumbnail(newSongs[0].thumbnailUrl);
   }
+
   return message;
 };
 
@@ -112,7 +113,7 @@ export const buildPlayingMessageEmbed = (player: Player): EmbedBuilder => {
   const { artist, thumbnailUrl, requestedBy } = currentlyPlaying;
   const message = new EmbedBuilder();
   message
-    .setColor(player.status === STATUS.PLAYING ? "DarkGreen" : "DarkRed")
+    .setColor(player.status === STATUS.PLAYING ? "Aqua" : "DarkRed")
     .setTitle(player.status === STATUS.PLAYING ? "Now Playing" : "Paused")
     .setDescription(
       `
@@ -121,7 +122,6 @@ export const buildPlayingMessageEmbed = (player: Player): EmbedBuilder => {
       ${getPlayerUI(player)}
     `
     )
-    .setFooter({ text: `Source: ${artist}` });
 
   if (thumbnailUrl) {
     message.setThumbnail(thumbnailUrl);
@@ -157,8 +157,7 @@ export const buildQueueEmbed = (player: Player, page: number): EmbedBuilder => {
     })
     .join("\n");
 
-  const { artist, thumbnailUrl, playlist, requestedBy } = currentlyPlaying;
-  const playlistTitle = playlist ? `(${playlist.title})` : "";
+  const { thumbnailUrl, requestedBy } = currentlyPlaying;
   const totalLength = player
     .getQueue()
     .reduce((accumulator, current) => accumulator + current.length, 0);
@@ -191,7 +190,6 @@ export const buildQueueEmbed = (player: Player, page: number): EmbedBuilder => {
       },
       { name: "Page", value: `${page} out of ${maxQueuePage}`, inline: true },
     ])
-    .setFooter({ text: `Source: ${artist} ${playlistTitle}` });
 
   if (thumbnailUrl) {
     message.setThumbnail(thumbnailUrl);
@@ -209,5 +207,47 @@ export const buildLyricsEmbed = (
     .setTitle(`Lyrics for ${song.title}`)
     .setDescription(lyrics)
     .setColor("Aqua");
+  return message;
+};
+
+export const buildSkipEmbed = (player: Player, n: number): EmbedBuilder => {
+  const currentlyPlaying = player.getCurrent();
+  if (!currentlyPlaying) {
+    throw new Error("queue is empty");
+  }
+
+  const { requestedBy } = currentlyPlaying;
+  const message = new EmbedBuilder();
+  if (n === 1) {
+    message.setTitle("Skipped").setDescription(
+      `
+      **${getSongTitle(currentlyPlaying)}**
+      Requested by: <@${requestedBy}>\n
+    `
+    );
+  } else {
+    message.setTitle(`Skipped ${n} songs`);
+  }
+
+  message.setColor("Green")
+  return message;
+};
+
+export const buildUnskipEmbed = (player: Player): EmbedBuilder => {
+  const currentlyPlaying = player.getCurrent();
+  if (!currentlyPlaying) {
+    throw new Error("queue is empty");
+  }
+
+  const { requestedBy } = currentlyPlaying;
+  const message = new EmbedBuilder();
+  message.setTitle("Unskipped").setDescription(
+    `
+      **${getSongTitle(currentlyPlaying)}**
+        Requested by: <@${requestedBy}>\n
+    `
+  );
+
+  message.setColor("Green");
   return message;
 };

@@ -1,4 +1,4 @@
-import { VoiceChannel, Snowflake } from "discord.js";
+import { VoiceChannel, Snowflake, Message, TextBasedChannel } from "discord.js";
 import { Readable } from "stream";
 import hasha from "hasha";
 import ytdl from "ytdl-core";
@@ -20,10 +20,11 @@ import {
 import FileCacheProvider from "./file-cache.js";
 import debug from "../utils/debug.js";
 import { prisma } from "../utils/db.js";
+import { buildPlayingMessageEmbed } from "../utils/build-embed.js";
 
 export enum MediaSource {
   Youtube,
-  HLS,
+  HLS
 }
 
 export interface QueuedPlaylist {
@@ -51,7 +52,7 @@ export interface QueuedSong extends SongMetadata {
 export enum STATUS {
   PLAYING,
   PAUSED,
-  IDLE,
+  IDLE
 }
 
 export interface PlayerEvents {
@@ -75,6 +76,9 @@ export default class {
   private readonly fileCache: FileCacheProvider;
   private disconnectTimer: NodeJS.Timeout | null = null;
 
+  private nowPlayingMsg!: Message;
+  private nowPlayingChannel!: TextBasedChannel;
+
   constructor(fileCache: FileCacheProvider, guildId: string) {
     this.fileCache = fileCache;
     this.guildId = guildId;
@@ -87,6 +91,25 @@ export default class {
       adapterCreator: channel.guild
         .voiceAdapterCreator as DiscordGatewayAdapterCreator,
     });
+  }
+
+  setTextChannel(textChannel: TextBasedChannel): void {
+    this.nowPlayingChannel = textChannel;
+  }
+
+  async newPlayingMessage(): Promise<void> {
+    try {
+      if (this.nowPlayingMsg && this.nowPlayingMsg.channelId === this.nowPlayingChannel.id) {
+        this.nowPlayingChannel.messages.cache.find(msg => msg.id === this.nowPlayingMsg.id)?.delete();
+      }
+
+      const msg = await this.nowPlayingChannel.send({
+        embeds: [buildPlayingMessageEmbed(this)],
+      });
+      this.nowPlayingMsg = msg;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   disconnect(): void {
@@ -223,6 +246,7 @@ export default class {
       this.status = STATUS.PLAYING;
       this.nowPlaying = currentSong;
 
+      this.newPlayingMessage();
       if (currentSong.url === this.lastSongURL) {
         this.startTrackingPosition();
       } else {
@@ -230,6 +254,7 @@ export default class {
         this.startTrackingPosition(0);
         this.lastSongURL = currentSong.url;
       }
+
     } catch (error: unknown) {
       await this.forward(1);
 

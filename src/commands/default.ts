@@ -21,16 +21,14 @@ export default class implements Command {
 
   constructor(@inject(TYPES.Managers.Player) playerManager: PlayerManager, @inject(TYPES.Services.AddQueryToQueue) queue: AddQueryToQueue, @inject(TYPES.Config) config: Config) {
     this.playerManager = playerManager;
-	this.queue = queue;
-	this.config = config;
+    this.queue = queue;
+    this.config = config;
   }
 
   public async execute(interaction: ChatInputCommandInteraction) {
-    const player = this.playerManager.get(interaction.guild!.id);
-
-  if(!this.config.DEFAULT_PLAYLIST){
-    throw new Error("You didn't specify a playlist in your env file!")
-  }
+    if(!this.config.DEFAULT_PLAYLIST){
+      throw new Error("You didn't specify a playlist in your env file!")
+    }
     
     await this.queue.addToQueue({
       interaction,
@@ -40,6 +38,6 @@ export default class implements Command {
       shouldSplitChapters: false,
     });
 
-    await interaction.reply('u betcha');
+    //await interaction.reply('u betcha');
   }
 }
