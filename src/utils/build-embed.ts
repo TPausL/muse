@@ -212,7 +212,7 @@ export const buildSkipEmbed = (player: Player, n: number): EmbedBuilder => {
     throw new Error("queue is empty");
   }
 
-  const { requestedBy } = currentlyPlaying;
+  const { requestedBy, thumbnailUrl } = currentlyPlaying;
   const message = new EmbedBuilder();
   if (n === 1) {
     message.setTitle("Skipped").setDescription(
@@ -220,7 +220,7 @@ export const buildSkipEmbed = (player: Player, n: number): EmbedBuilder => {
       **${getSongTitle(currentlyPlaying)}**
       Requested by: <@${requestedBy}>\n
     `
-    );
+    ).setThumbnail(thumbnailUrl);
   } else {
     message.setTitle(`Skipped ${n} songs`);
   }
@@ -242,8 +242,7 @@ export const buildUnskipEmbed = (player: Player): EmbedBuilder => {
       **${getSongTitle(currentlyPlaying)}**
         Requested by: <@${requestedBy}>\n
     `
-  );
-
-  message.setColor("Green");
+  ).setColor("Green")
+    .setThumbnail(currentlyPlaying.thumbnailUrl);
   return message;
 };
