@@ -373,10 +373,9 @@ export default class {
   }
 
   add(song: QueuedSong, { immediate = false } = {}): void {
-    if (song.playlist || !immediate) {
+    if (immediate) {
       // Add to end of queue
-      this.queue.push(song);
-    } else {
+      console.log(immediate);
       // Add as the next song to be played
       const insertAt = this.queuePosition + 1;
       this.queue = [
@@ -384,6 +383,8 @@ export default class {
         song,
         ...this.queue.slice(insertAt)
       ];
+    } else {
+      this.queue.push(song);
     }
   }
 

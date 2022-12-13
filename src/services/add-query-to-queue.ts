@@ -152,6 +152,7 @@ export default class AddQueryToQueue {
       newSongs = shuffle(newSongs);
     }
 
+    newSongs.reverse();
     newSongs.forEach(song => {
       player.add(
         {
