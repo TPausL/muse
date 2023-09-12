@@ -1,10 +1,12 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
+  APIEmbedField,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
   EmbedBuilder
 } from "discord.js";
 import { inject, injectable } from "inversify";
+import { Pagination } from "pagination.djs";
 import Command from ".";
 import AddQueryToQueue from "../services/add-query-to-queue.js";
 import { TYPES } from "../types.js";
