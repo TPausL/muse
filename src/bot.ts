@@ -23,10 +23,7 @@ export default class {
   private readonly commandsByName!: Collection<string, Command>;
   private readonly commandsByButtonId!: Collection<string, Command>;
 
-  constructor(
-  @inject(TYPES.Client) client: Client,
-    @inject(TYPES.Config) config: Config
-  ) {
+  constructor(@inject(TYPES.Client) client: Client, @inject(TYPES.Config) config: Config) {
     this.client = client;
     this.config = config;
     this.shouldRegisterCommandsOnBot = config.REGISTER_COMMANDS_ON_BOT;
@@ -130,7 +127,7 @@ export default class {
               ephemeral: true
             });
           }
-        } catch {}
+        } catch { }
       }
     });
 
@@ -184,8 +181,7 @@ export default class {
       });
 
       spinner.succeed(
-        `Ready! Invite the bot with https://discordapp.com/oauth2/authorize?client_id=${
-          this.client.user?.id ?? ""
+        `Ready! Invite the bot with https://discordapp.com/oauth2/authorize?client_id=${this.client.user?.id ?? ""
         }&scope=bot%20applications.commands&permissions=36700160`
       );
     });

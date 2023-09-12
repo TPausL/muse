@@ -5,6 +5,13 @@ import ytdl from "ytdl-core";
 import { WriteStream } from "fs-capacitor";
 import ffmpeg from "fluent-ffmpeg";
 import shuffle from "array-shuffle";
+import { VoiceChannel, Snowflake } from 'discord.js';
+import { Readable } from 'stream';
+import hasha from 'hasha';
+import ytdl, { videoFormat } from 'ytdl-core';
+import { WriteStream } from 'fs-capacitor';
+import ffmpeg from 'fluent-ffmpeg';
+import shuffle from 'array-shuffle';
 import {
   AudioPlayer,
   AudioPlayerState,
@@ -21,6 +28,7 @@ import FileCacheProvider from "./file-cache.js";
 import debug from "../utils/debug.js";
 import { prisma } from "../utils/db.js";
 import { buildPlayingMessageEmbed } from "../utils/build-embed.js";
+import { getGuildSettings } from '../utils/get-guild-settings';
 
 export enum MediaSource {
   Youtube,
@@ -59,6 +67,8 @@ export interface PlayerEvents {
   statusChange: (oldStatus: STATUS, newStatus: STATUS) => void;
 }
 
+type YTDLVideoFormat = videoFormat & { loudnessDb?: number };
+
 export default class {
   public voiceConnection: VoiceConnection | null = null;
   public status = STATUS.PAUSED;
@@ -91,7 +101,6 @@ export default class {
       adapterCreator: channel.guild
         .voiceAdapterCreator as DiscordGatewayAdapterCreator
     });
-
 
     this.voiceConnection.on('stateChange', (oldState, newState) => {
       /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -477,14 +486,14 @@ export default class {
     options: { seek?: number; to?: number } = {}
   ): Promise<Readable> {
     if (song.source === MediaSource.HLS) {
-      return this.createReadStream(song.url);
+      return this.createReadStream({ url: song.url, cacheKey: song.url });
     }
 
-    let ffmpegInput = "";
+    let ffmpegInput: string | null;
     const ffmpegInputOptions: string[] = [];
     let shouldCacheVideo = false;
 
-    let format: ytdl.videoFormat | undefined;
+    let format: YTDLVideoFormat | undefined;
 
     try {
       ffmpegInput = await this.fileCache.getPathFor(
@@ -550,6 +559,8 @@ export default class {
         }
       }
 
+      debug('Using format', format);
+
       ffmpegInput = format.url;
 
       // Don't cache livestreams or long videos
@@ -560,29 +571,32 @@ export default class {
         MAX_CACHE_LENGTH_SECONDS &&
         !options.seek;
 
-      ffmpegInputOptions.push(
-        ...[
-          "-reconnect",
-          "1",
-          "-reconnect_streamed",
-          "1",
-          "-reconnect_delay_max",
-          "5"
-        ]
-      );
+      debug(shouldCacheVideo ? 'Caching video' : 'Not caching video');
 
-      if (options.seek) {
-        ffmpegInputOptions.push("-ss", options.seek.toString());
-      }
-
-      if (options.to) {
-        ffmpegInputOptions.push("-to", options.to.toString());
-      }
+      ffmpegInputOptions.push(...[
+        '-reconnect',
+        '1',
+        '-reconnect_streamed',
+        '1',
+        '-reconnect_delay_max',
+        '5',
+      ]);
     }
 
-    return this.createReadStream(ffmpegInput, {
+    if (options.seek) {
+      ffmpegInputOptions.push('-ss', options.seek.toString());
+    }
+
+    if (options.to) {
+      ffmpegInputOptions.push('-to', options.to.toString());
+    }
+
+    return this.createReadStream({
+      url: ffmpegInput,
+      cacheKey: song.url,
       ffmpegInputOptions,
-      cache: shouldCacheVideo
+      cache: shouldCacheVideo,
+      volumeAdjustment: format?.loudnessDb ? `${-format.loudnessDb}dB` : undefined,
     });
   }
 
@@ -659,29 +673,25 @@ export default class {
     }
   }
 
-  private async createReadStream(
-    url: string,
-    options: { ffmpegInputOptions?: string[]; cache?: boolean } = {}
-  ): Promise<Readable> {
+  private async createReadStream(options: { url: string; cacheKey: string; ffmpegInputOptions?: string[]; cache?: boolean; volumeAdjustment?: string }): Promise<Readable> {
     return new Promise((resolve, reject) => {
       const capacitor = new WriteStream();
 
       if (options?.cache) {
-        const cacheStream = this.fileCache.createWriteStream(
-          this.getHashForCache(url)
-        );
+        const cacheStream = this.fileCache.createWriteStream(this.getHashForCache(options.cacheKey));
         capacitor.createReadStream().pipe(cacheStream);
       }
 
       const returnedStream = capacitor.createReadStream();
       let hasReturnedStreamClosed = false;
 
-      const stream = ffmpeg(url)
-        .inputOptions(options?.ffmpegInputOptions ?? ["-re"])
+      const stream = ffmpeg(options.url)
+        .inputOptions(options?.ffmpegInputOptions ?? ['-re'])
         .noVideo()
-        .audioCodec("libopus")
-        .outputFormat("webm")
-        .on("error", error => {
+        .audioCodec('libopus')
+        .outputFormat('webm')
+        .addOutputOption(['-filter:a', `volume=${options?.volumeAdjustment ?? '1'}`])
+        .on('error', error => {
           if (!hasReturnedStreamClosed) {
             reject(error);
           }

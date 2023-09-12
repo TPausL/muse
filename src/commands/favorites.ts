@@ -77,10 +77,8 @@ export default class implements Command {
         )
     );
 
-  constructor(
-    @inject(TYPES.Services.AddQueryToQueue)
-    private readonly addQueryToQueue: AddQueryToQueue
-  ) {}
+  constructor(@inject(TYPES.Services.AddQueryToQueue) private readonly addQueryToQueue: AddQueryToQueue) {
+  }
 
   requiresVC = (interaction: ChatInputCommandInteraction) =>
     interaction.options.getSubcommand() === "use";
@@ -114,10 +112,7 @@ export default class implements Command {
       }
     });
 
-    let results =
-      query === ""
-        ? favorites
-        : favorites.filter(f => f.name.startsWith(query));
+    let results = query === '' ? favorites : favorites.filter(f => f.name.toLowerCase().startsWith(query.toLowerCase()));
 
     if (subcommand === "remove") {
       // Only show favorites that user is allowed to remove
@@ -127,12 +122,12 @@ export default class implements Command {
           : results.filter(r => r.authorId === interaction.member!.user.id);
     }
 
-    await interaction.respond(
-      results.map(r => ({
-        name: r.name,
-        value: r.name
-      }))
-    );
+    // Limit results to 25 maximum per Discord limits
+    const trimmed = results.length > 25 ? results.slice(0, 25) : results;
+    await interaction.respond(trimmed.map(r => ({
+      name: r.name,
+      value: r.name,
+    })));
   }
 
   private async use(interaction: ChatInputCommandInteraction) {
@@ -170,18 +165,22 @@ export default class implements Command {
       return;
     }
 
-    const embed = new EmbedBuilder().setTitle("Favorites");
-
-    let description = "";
-    for (const favorite of favorites) {
-      description += `**${favorite.name}**: ${favorite.query} (<@${favorite.authorId}>)\n`;
+    const fields = new Array<APIEmbedField>(favorites.length);
+    for (let index = 0; index < favorites.length; index++) {
+      const favorite = favorites[index];
+      fields[index] = {
+        inline: false,
+        name: favorite.name,
+        value: `${favorite.query} (<@${favorite.authorId}>)`,
+      };
     }
 
-    embed.setDescription(description);
-
-    await interaction.reply({
-      embeds: [embed]
-    });
+    await new Pagination(
+      interaction as ChatInputCommandInteraction<'cached'>,
+      { ephemeral: true, limit: 25 })
+      .setFields(fields)
+      .paginateFields(true)
+      .render();
   }
 
   private async create(interaction: ChatInputCommandInteraction) {

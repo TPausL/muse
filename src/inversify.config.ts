@@ -1,32 +1,34 @@
-import "reflect-metadata";
-import { Container } from "inversify";
-import { TYPES } from "./types.js";
-import Bot from "./bot.js";
 import { Client, GatewayIntentBits } from "discord.js";
+import { Container } from "inversify";
+import "reflect-metadata";
+import Bot from "./bot.js";
 import ConfigProvider from "./services/config.js";
+import { TYPES } from "./types.js";
 
 // Managers
 import PlayerManager from "./managers/player.js";
 
 // Services
 import AddQueryToQueue from "./services/add-query-to-queue.js";
-import GetSongs from "./services/get-songs.js";
-import YoutubeAPI from "./services/youtube-api.js";
-import SpotifyAPI from "./services/spotify-api.js";
 import GeniusApi from "./services/genius-api.js";
+import GetSongs from "./services/get-songs.js";
 import LyricsService from "./services/lyrics";
+import SpotifyAPI from "./services/spotify-api.js";
+import YoutubeAPI from "./services/youtube-api.js";
 
 // Comands
 import Command from "./commands";
-import Lyrics from "./commands/lyrics.js";
-import Insert from "./commands/insert.js";
 import Clear from "./commands/clear.js";
 import Config from "./commands/config.js";
-import Disconnect from "./commands/disconnect.js";
 import Default from "./commands/default.js";
+import Disconnect from "./commands/disconnect.js";
 import Favorites from "./commands/favorites.js";
 import ForwardSeek from "./commands/fseek.js";
+import Insert from "./commands/insert.js";
+import Loop from "./commands/loop";
+import Lyrics from "./commands/lyrics.js";
 import Move from "./commands/move.js";
+import Next from "./commands/next.js";
 import NowPlaying from "./commands/now-playing.js";
 import Pause from "./commands/pause.js";
 import Play from "./commands/play.js";
@@ -36,13 +38,13 @@ import Resume from "./commands/resume.js";
 import Seek from "./commands/seek.js";
 import Shuffle from "./commands/shuffle.js";
 import Skip from "./commands/skip.js";
-import Next from "./commands/next.js";
 import Stop from "./commands/stop.js";
 import Unskip from "./commands/unskip.js";
-import ThirdParty from "./services/third-party.js";
 import FileCacheProvider from "./services/file-cache.js";
 import KeyValueCacheProvider from "./services/key-value-cache.js";
-import Loop from "./commands/loop";
+import ThirdParty from "./services/third-party.js";
+// Commands
+import Replay from './commands/replay.js';
 
 const container = new Container();
 
@@ -96,17 +98,19 @@ container
   Disconnect,
   Favorites,
   ForwardSeek,
+  Loop,
   Move,
+  Next,
   NowPlaying,
   Pause,
   Play,
   QueueCommand,
   Remove,
+  Replay,
   Resume,
   Seek,
   Shuffle,
   Skip,
-  Next,
   Stop,
   Unskip,
   Loop,

@@ -1,7 +1,7 @@
 import { VoiceChannel, VoiceState } from "discord.js";
 import container from "../inversify.config.js";
-import { TYPES } from "../types.js";
 import PlayerManager from "../managers/player.js";
+import { TYPES } from "../types.js";
 import { getSizeWithoutBots } from "../utils/channels.js";
 import { prisma } from "../utils/db.js";
 

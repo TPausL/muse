@@ -1,15 +1,14 @@
 /* eslint-disable complexity */
+import shuffle from "array-shuffle";
 import {
   ChatInputCommandInteraction,
   GuildMember
 } from "discord.js";
 import { inject, injectable } from "inversify";
-import shuffle from "array-shuffle";
-import { TYPES } from "../types.js";
-import GetSongs from "../services/get-songs.js";
-import { SongMetadata, STATUS } from "./player.js";
+import { URL } from 'node:url';
 import PlayerManager from "../managers/player.js";
-import { prisma } from "../utils/db.js";
+import GetSongs from "../services/get-songs.js";
+import { TYPES } from "../types.js";
 import {
   buildAddedEmbed
 } from "../utils/build-embed.js";
@@ -17,13 +16,15 @@ import {
   getMemberVoiceChannel,
   getMostPopularVoiceChannel
 } from "../utils/channels.js";
+import { prisma } from "../utils/db.js";
+import { SongMetadata, STATUS } from "./player.js";
 
 @injectable()
 export default class AddQueryToQueue {
   constructor(
     @inject(TYPES.Services.GetSongs) private readonly getSongs: GetSongs,
     @inject(TYPES.Managers.Player) private readonly playerManager: PlayerManager
-  ) {}
+  ) { }
 
   public async addToQueue({
     query,
