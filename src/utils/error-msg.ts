@@ -1,6 +1,6 @@
 export default (error?: string | Error): string => {
   let str = "unknown error";
-
+  console.error(error)
   if (error) {
     if (typeof error === 'string') {
       str = `🚫 ope: ${error}`;

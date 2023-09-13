@@ -18,6 +18,7 @@ import {
 } from "../utils/channels.js";
 import { prisma } from "../utils/db.js";
 import { SongMetadata, STATUS } from "./player.js";
+import {custom} from "../utils/debug.js"
 
 @injectable()
 export default class AddQueryToQueue {
@@ -155,6 +156,7 @@ export default class AddQueryToQueue {
 
     newSongs.reverse();
     newSongs.forEach(song => {
+      console.warn("new song", song)
       player.add(
         {
           ...song,
@@ -203,7 +205,7 @@ export default class AddQueryToQueue {
           extraMsg,
           player,
           query
-        })
+        }) 
       ]
     });
   }

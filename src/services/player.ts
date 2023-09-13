@@ -1,34 +1,26 @@
-import { VoiceChannel, Snowflake, Message, TextBasedChannel } from "discord.js";
-import { Readable } from "stream";
-import hasha from "hasha";
-import ytdl from "ytdl-core";
-import { WriteStream } from "fs-capacitor";
-import ffmpeg from "fluent-ffmpeg";
-import shuffle from "array-shuffle";
-import { VoiceChannel, Snowflake } from 'discord.js';
-import { Readable } from 'stream';
-import hasha from 'hasha';
-import ytdl, { videoFormat } from 'ytdl-core';
-import { WriteStream } from 'fs-capacitor';
-import ffmpeg from 'fluent-ffmpeg';
-import shuffle from 'array-shuffle';
 import {
   AudioPlayer,
   AudioPlayerState,
   AudioPlayerStatus,
-  createAudioPlayer,
-  createAudioResource,
   DiscordGatewayAdapterCreator,
-  joinVoiceChannel,
   StreamType,
   VoiceConnection,
-  VoiceConnectionStatus
+  VoiceConnectionStatus,
+  createAudioPlayer,
+  createAudioResource,
+  joinVoiceChannel
 } from "@discordjs/voice";
-import FileCacheProvider from "./file-cache.js";
-import debug from "../utils/debug.js";
-import { prisma } from "../utils/db.js";
+import shuffle from "array-shuffle";
+import { Message, Snowflake, TextBasedChannel, VoiceChannel } from "discord.js";
+import ffmpeg from "fluent-ffmpeg";
+import { WriteStream } from "fs-capacitor";
+import hasha from "hasha";
+import { Readable } from "stream";
+import ytdl, { videoFormat } from "ytdl-core";
 import { buildPlayingMessageEmbed } from "../utils/build-embed.js";
-import { getGuildSettings } from '../utils/get-guild-settings';
+import { prisma } from "../utils/db.js";
+import debug from "../utils/debug.js";
+import FileCacheProvider from "./file-cache.js";
 
 export enum MediaSource {
   Youtube,
@@ -140,7 +132,6 @@ export default class {
       });
       this.nowPlayingMsg = msg;
     } catch (err) {
-      console.log(err);
     }
   }
 
@@ -402,7 +393,6 @@ export default class {
   add(song: QueuedSong, { immediate = false } = {}): void {
     if (immediate) {
       // Add to end of queue
-      console.log(immediate);
       // Add as the next song to be played
       const insertAt = this.queuePosition + 1;
       this.queue = [
@@ -499,6 +489,9 @@ export default class {
       ffmpegInput = await this.fileCache.getPathFor(
         this.getHashForCache(song.url)
       );
+      if(!ffmpegInput){
+        throw "no url in cache"
+      }
 
       if (options.seek) {
         ffmpegInputOptions.push("-ss", options.seek.toString());
@@ -508,6 +501,7 @@ export default class {
         ffmpegInputOptions.push("-to", options.to.toString());
       }
     } catch {
+
       // Not yet cached, must download
       const info = await ytdl.getInfo(song.url);
 
@@ -560,7 +554,6 @@ export default class {
       }
 
       debug('Using format', format);
-
       ffmpegInput = format.url;
 
       // Don't cache livestreams or long videos
@@ -684,7 +677,6 @@ export default class {
 
       const returnedStream = capacitor.createReadStream();
       let hasReturnedStreamClosed = false;
-
       const stream = ffmpeg(options.url)
         .inputOptions(options?.ffmpegInputOptions ?? ['-re'])
         .noVideo()

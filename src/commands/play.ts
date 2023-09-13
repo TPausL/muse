@@ -13,6 +13,7 @@ import getYouTubeAndSpotifySuggestionsFor from "../utils/get-youtube-and-spotify
 import KeyValueCacheProvider from "../services/key-value-cache.js";
 import { ONE_HOUR_IN_SECONDS } from "../utils/constants.js";
 import AddQueryToQueue from "../services/add-query-to-queue.js";
+import {custom} from "../utils/debug.js"
 
 @injectable()
 export default class implements Command {
@@ -62,6 +63,7 @@ export default class implements Command {
     interaction: ChatInputCommandInteraction
   ): Promise<void> {
     const query = interaction.options.getString("query")!;
+    console.warn("query", query)
     await this.addQueryToQueue.addToQueue({
       interaction,
       query: query.trim(),

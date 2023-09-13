@@ -82,7 +82,6 @@ export const buildAddedEmbed = ({
     )
     .setColor("Green");
   if (newSongs.length > 1) {
-    console.log(newSongs[0].playlist);
     message
       .setDescription(
         `from playlist [${newSongs[0].playlist?.title ?? ""}](https://youtube.com/playlist?list=${newSongs[0].playlist?.source ?? ""})`

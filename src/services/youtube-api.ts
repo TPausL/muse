@@ -119,7 +119,6 @@ export default class {
     if (!firstVideo) {
       throw new Error("No video found.");
     }
-
     return this.getVideo(firstVideo.url, shouldSplitChapters);
   }
 
@@ -130,7 +129,6 @@ export default class {
     if (!video) {
       throw new Error('Video could not be found.');
     }
-
     return this.getMetadataFromVideo({ video, shouldSplitChapters });
   }
 
@@ -232,7 +230,8 @@ export default class {
       artist: video.snippet.channelTitle,
       length: toSeconds(parse(video.contentDetails.duration)),
       offset: 0,
-      url: video.id,
+      //changed url part
+      url: "https://youtube.com/watch?v=" + video.id,
       playlist: queuedPlaylist ?? null,
       isLive: video.snippet.liveBroadcastContent === 'live',
       thumbnailUrl: video.snippet.thumbnails.medium.url,
